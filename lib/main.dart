@@ -1,16 +1,28 @@
 import 'package:clocker/models/pin/pin.dart';
-import 'package:clocker/services/database.service.dart';
+import 'package:clocker/utils/int-to-bool.util.dart';
 import 'package:flutter/material.dart';
 
 import 'package:clocker/pages/welcome.page.dart';
 import './services/pins-db.service.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final allPins = await PinsDbService.getAllPins();
+  final anActivePinExists = allPins.any((pin) => intToBool(pin['is_active']));
+  String initialRoute = '/';
+
+  if (allPins.isEmpty || !anActivePinExists) {
+    initialRoute = '/welcome';
+  }
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      initialRoute: initialRoute,
       routes: {
         '/': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
         '/welcome': (context) => const WelcomePage(),
