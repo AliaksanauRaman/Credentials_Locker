@@ -30,4 +30,14 @@ class PinsDbService {
 
     return maps;
   }
+
+  static Future<void> deletePin(int pinId) async {
+    final database = await DatabaseService.instance.database;
+
+    if (database == null) {
+      throw Exception("Database is not defined!");
+    }
+
+    await database.delete('pins', where: 'id = ?', whereArgs: [pinId]);
+  }
 }
